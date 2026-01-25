@@ -1,0 +1,192 @@
+// ===========================================
+// Prisma Schema - Zapify
+// ===========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Usuario do Dashboard
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(OPERATOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+}
+
+// Contato do WhatsApp
+model Contact {
+  id           String         @id @default(cuid())
+  phone        String         @unique
+  name         String?
+  profilePic   String?
+  isBlocked    Boolean        @default(false)
+  tags         String[]       @default([])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  conversations Conversation[]
+
+  @@map("contacts")
+}
+
+// Conversa
+model Conversation {
+  id            String             @id @default(cuid())
+  contactId     String
+  contact       Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  status        ConversationStatus @default(ACTIVE)
+  lastMessageAt DateTime?
+  unreadCount   Int                @default(0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  messages      Message[]
+  context       ConversationContext?
+
+  @@map("conversations")
+}
+
+enum ConversationStatus {
+  ACTIVE
+  ARCHIVED
+  BLOCKED
+}
+
+// Contexto da Conversa (para IA)
+model ConversationContext {
+  id             String       @id @default(cuid())
+  conversationId String       @unique
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  messages       Json         @default("[]")
+  summary        String?
+  updatedAt      DateTime     @updatedAt
+
+  @@map("conversation_contexts")
+}
+
+// Mensagem
+model Message {
+  id             String           @id @default(cuid())
+  conversationId String
+  conversation   Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  content        String
+  type           MessageType      @default(TEXT)
+  direction      MessageDirection
+  isFromBot      Boolean          @default(false)
+  mediaUrl       String?
+  sentAt         DateTime         @default(now())
+  deliveredAt    DateTime?
+  readAt         DateTime?
+
+  @@index([conversationId, sentAt])
+  @@map("messages")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  VIDEO
+  DOCUMENT
+  STICKER
+}
+
+enum MessageDirection {
+  INCOMING
+  OUTGOING
+}
+
+// Auto-resposta
+model AutoReply {
+  id          String      @id @default(cuid())
+  trigger     String
+  triggerType TriggerType @default(CONTAINS)
+  response    String
+  isActive    Boolean     @default(true)
+  priority    Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("auto_replies")
+}
+
+enum TriggerType {
+  EXACT
+  CONTAINS
+  REGEX
+}
+
+// Template de Mensagem
+model Template {
+  id        String   @id @default(cuid())
+  name      String
+  content   String
+  variables String[] @default([])
+  category  String   @default("geral")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("templates")
+}
+
+// Configuracao do Bot
+model BotConfig {
+  id                 String   @id @default("default")
+  isActive           Boolean  @default(true)
+  aiProvider         String   @default("gemini")
+  aiModel            String   @default("gemini-pro")
+  aiTemperature      Float    @default(0.7)
+  aiMaxTokens        Int      @default(1000)
+  welcomeMessage     String?
+  awayMessage        String?
+  businessHoursStart String?
+  businessHoursEnd   String?
+  businessDays       Int[]    @default([1, 2, 3, 4, 5])
+  systemPrompt       String?
+  updatedAt          DateTime @updatedAt
+
+  @@map("bot_config")
+}
+
+// Fluxo de Mensagens
+model Flow {
+  id          String      @id @default(cuid())
+  name        String
+  trigger     String
+  triggerType TriggerType @default(CONTAINS)
+  steps       Json        @default("[]")
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("flows")
+}
+
+// Log de Atividades
+model ActivityLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  data      Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@map("activity_logs")
+}
