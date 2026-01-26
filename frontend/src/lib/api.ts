@@ -134,4 +134,15 @@ export const statsApi = {
   hourly: () => api.get("/api/stats/hourly"),
 };
 
+// Knowledge Base
+export const knowledgeApi = {
+  list: (params?: Record<string, string>) =>
+    api.get("/api/knowledge", { params }),
+  get: (id: string) => api.get(`/api/knowledge/${id}`),
+  create: (data: Record<string, unknown>) => api.post("/api/knowledge", data),
+  update: (id: string, data: Record<string, unknown>) =>
+    api.put(`/api/knowledge/${id}`, data),
+  delete: (id: string) => api.delete(`/api/knowledge/${id}`),
+};
+
 export default api;

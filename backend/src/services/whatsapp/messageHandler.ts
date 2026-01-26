@@ -4,6 +4,7 @@ import { emitToAll } from '../../config/socket.js';
 import { extractPhoneFromWid, matchesTrigger, isWithinBusinessHours, randomDelay } from '../../utils/helpers.js';
 import { generateAIResponse } from '../ai/provider.js';
 import { sendMessage } from './client.js';
+import { getKnowledgeContext } from '../../controllers/knowledgeController.js';
 
 // Processa mensagem recebida
 export async function handleIncomingMessage(waMessage: WAMessage): Promise<void> {
@@ -155,11 +156,16 @@ export async function handleIncomingMessage(waMessage: WAMessage): Promise<void>
         content: m.content,
       }));
 
+      // Busca base de conhecimento e concatena com system prompt
+      const knowledgeContext = await getKnowledgeContext();
+      const fullSystemPrompt = (botConfig.systemPrompt || '') + knowledgeContext;
+
       console.log('🧠 Gerando resposta da IA...');
+      console.log('📚 Base de conhecimento:', knowledgeContext ? 'carregada' : 'vazia');
       const aiResponse = await generateAIResponse(
         content,
         context as Array<{ role: 'user' | 'assistant'; content: string }>,
-        botConfig.systemPrompt || undefined
+        fullSystemPrompt || undefined
       );
 
       console.log('🤖 Resposta da IA:', aiResponse ? aiResponse.substring(0, 50) + '...' : 'null');

@@ -28,7 +28,7 @@ async function main() {
       id: 'default',
       isActive: true,
       aiProvider: 'gemini',
-      aiModel: 'gemini-pro',
+      aiModel: 'gemini-2.5-flash',
       aiTemperature: 0.7,
       aiMaxTokens: 1000,
       welcomeMessage: 'Ola! Bem-vindo ao nosso atendimento. Como posso ajudar?',
@@ -126,6 +126,59 @@ Diretrizes:
     });
   }
   console.log(`✅ ${templates.length} templates criados`);
+
+  // Cria exemplos de base de conhecimento
+  const knowledgeItems = [
+    {
+      category: 'COMPANY' as const,
+      title: 'Nome da Empresa',
+      content: 'Somos a Zapify, uma empresa especializada em automacao de atendimento via WhatsApp.',
+      priority: 10,
+    },
+    {
+      category: 'COMPANY' as const,
+      title: 'Localizacao',
+      content: 'Estamos localizados em Sao Paulo, Brasil. Atendemos todo o territorio nacional.',
+      priority: 5,
+    },
+    {
+      category: 'RULES' as const,
+      title: 'Regra Principal',
+      content: 'Sempre responda de forma educada e profissional. Nunca fale sobre assuntos que nao sejam relacionados aos nossos produtos e servicos.',
+      priority: 10,
+    },
+    {
+      category: 'RULES' as const,
+      title: 'Encaminhamento para Atendente',
+      content: 'Se o cliente solicitar falar com um humano ou se voce nao souber responder, informe que um atendente entrara em contato em breve.',
+      priority: 8,
+    },
+    {
+      category: 'FAQ' as const,
+      title: 'Como funciona o servico?',
+      content: 'Nosso servico automatiza o atendimento via WhatsApp usando inteligencia artificial. Voce cadastra as informacoes e o bot responde seus clientes 24/7.',
+      priority: 5,
+    },
+    {
+      category: 'PRICING' as const,
+      title: 'Planos disponiveis',
+      content: 'Oferecemos planos a partir de R$ 99/mes. Para mais informacoes sobre precos, entre em contato com nossa equipe comercial.',
+      priority: 5,
+    },
+    {
+      category: 'POLICIES' as const,
+      title: 'Politica de Reembolso',
+      content: 'Oferecemos reembolso integral em ate 7 dias apos a contratacao, sem perguntas.',
+      priority: 5,
+    },
+  ];
+
+  for (const item of knowledgeItems) {
+    await prisma.knowledgeBase.create({
+      data: item,
+    });
+  }
+  console.log(`✅ ${knowledgeItems.length} itens de conhecimento criados`);
 
   console.log('🎉 Seed concluido com sucesso!');
   console.log('\n📌 Credenciais do admin:');

@@ -16,6 +16,7 @@ import templateRoutes from './routes/templates.js';
 import flowRoutes from './routes/flows.js';
 import configRoutes from './routes/config.js';
 import statsRoutes from './routes/stats.js';
+import knowledgeRoutes from './routes/knowledge.js';
 
 // Importa servico do WhatsApp
 import { initializeWhatsApp } from './services/whatsapp/client.js';
@@ -49,6 +50,7 @@ app.use('/api/templates', templateRoutes);
 app.use('/api/flows', flowRoutes);
 app.use('/api/config', configRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/knowledge', knowledgeRoutes);
 
 // Rota de health check
 app.get('/health', (_req, res) => {

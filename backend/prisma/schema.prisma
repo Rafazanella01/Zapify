@@ -190,3 +190,26 @@ model ActivityLog {
   @@index([entity, entityId])
   @@map("activity_logs")
 }
+
+// Base de Conhecimento
+model KnowledgeBase {
+  id        String            @id @default(cuid())
+  category  KnowledgeCategory
+  title     String
+  content   String
+  isActive  Boolean           @default(true)
+  priority  Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@map("knowledge_base")
+}
+
+enum KnowledgeCategory {
+  COMPANY      // Informacoes sobre a empresa
+  PRODUCTS     // Produtos e servicos
+  RULES        // Regras de negocio e atendimento
+  FAQ          // Perguntas frequentes
+  PRICING      // Precos e valores
+  POLICIES     // Politicas (troca, devolucao, etc)
+}
