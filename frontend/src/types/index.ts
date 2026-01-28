@@ -135,6 +135,39 @@ export interface StatsOverview {
   botMessages: number;
 }
 
+// Campaign
+export interface Campaign {
+  id: string;
+  name: string;
+  message: string;
+  mediaUrl: string | null;
+  status: "DRAFT" | "SCHEDULED" | "RUNNING" | "PAUSED" | "COMPLETED" | "CANCELLED";
+  targetType: "ALL" | "TAGS" | "SELECTED";
+  targetTags: string[];
+  targetContacts: string[];
+  scheduledAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  totalRecipients: number;
+  sentCount: number;
+  deliveredCount: number;
+  failedCount: number;
+  delayBetween: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignLog {
+  id: string;
+  campaignId: string;
+  contactId: string;
+  phone: string;
+  status: "PENDING" | "SENT" | "DELIVERED" | "FAILED";
+  error: string | null;
+  sentAt: string | null;
+  createdAt: string;
+}
+
 // API Response
 export interface ApiResponse<T = unknown> {
   success: boolean;

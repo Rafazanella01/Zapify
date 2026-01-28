@@ -17,6 +17,7 @@ import {
   X,
   Bot,
   BookOpen,
+  Send,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSocket, useSocketStore } from "@/hooks/useSocket";
@@ -29,6 +30,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Conversas", href: "/dashboard/conversations", icon: MessageCircle },
   { name: "Contatos", href: "/dashboard/contacts", icon: Users },
+  { name: "Campanhas", href: "/dashboard/campaigns", icon: Send },
   { name: "Auto-Respostas", href: "/dashboard/auto-replies", icon: MessageSquare },
   { name: "Templates", href: "/dashboard/templates", icon: FileText },
   { name: "Fluxos", href: "/dashboard/flows", icon: GitBranch },

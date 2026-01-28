@@ -213,3 +213,66 @@ enum KnowledgeCategory {
   PRICING      // Precos e valores
   POLICIES     // Politicas (troca, devolucao, etc)
 }
+
+// Campanha de Mensagens
+model Campaign {
+  id              String           @id @default(cuid())
+  name            String
+  message         String
+  mediaUrl        String?
+  status          CampaignStatus   @default(DRAFT)
+  targetType      CampaignTarget   @default(ALL)
+  targetTags      String[]         @default([])
+  targetContacts  String[]         @default([])
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  totalRecipients Int              @default(0)
+  sentCount       Int              @default(0)
+  deliveredCount  Int              @default(0)
+  failedCount     Int              @default(0)
+  delayBetween    Int              @default(3000)  // ms entre mensagens
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  logs            CampaignLog[]
+
+  @@map("campaigns")
+}
+
+enum CampaignStatus {
+  DRAFT        // Rascunho
+  SCHEDULED    // Agendada
+  RUNNING      // Em execucao
+  PAUSED       // Pausada
+  COMPLETED    // Concluida
+  CANCELLED    // Cancelada
+}
+
+enum CampaignTarget {
+  ALL          // Todos os contatos
+  TAGS         // Contatos com tags especificas
+  SELECTED     // Contatos selecionados manualmente
+}
+
+// Log de envio da campanha
+model CampaignLog {
+  id         String            @id @default(cuid())
+  campaignId String
+  campaign   Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contactId  String
+  phone      String
+  status     CampaignLogStatus @default(PENDING)
+  error      String?
+  sentAt     DateTime?
+  createdAt  DateTime          @default(now())
+
+  @@index([campaignId, status])
+  @@map("campaign_logs")
+}
+
+enum CampaignLogStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
